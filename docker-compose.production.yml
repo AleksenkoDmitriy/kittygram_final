@@ -1,7 +1,4 @@
-volumes:
-  pg_data:
-  static:
-  media:
+version: '3.8'
 
 services:
   db:
@@ -12,7 +9,7 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend/
+    image: ${DOCKER_USERNAME}/kittygram_backend:latest
     env_file: .env
     depends_on:
       - db
@@ -21,19 +18,22 @@ services:
       - media:/app/media
 
   frontend:
-    build: ./frontend/
-    container_name: frontend
-    command: sh -c "cp -r /app/build/. /static/ 2>/dev/null || true && tail -f /dev/null"
+    image: ${DOCKER_USERNAME}/kittygram_frontend:latest
+    command: cp -r /app/build/. /static/
     volumes:
       - static:/static
 
   gateway:
-    build: ./nginx/
-    env_file: .env
+    image: ${DOCKER_USERNAME}/kittygram_gateway:latest
     ports:
-      - 9000:80
+      - "80:80"
     depends_on:
       - backend
     volumes:
       - static:/static
       - media:/media
+
+volumes:
+  pg_data:
+  static:
+  media:
