@@ -10,6 +10,7 @@ services:
       - .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+    container_name: db
 
   backend:
     build: ./backend/
@@ -19,14 +20,16 @@ services:
     volumes:
       - static:/app/static
       - media:/app/media
+    container_name: backend
 
   frontend:
     build: ./frontend/
+    env_file: .env
     container_name: frontend
-    command: sh -c "cp -r /app/build/. /static/ 2>/dev/null || true && tail -f /dev/null"
+    command: cp -r /app/build/. /static/
     volumes:
       - static:/static
-
+      
   gateway:
     build: ./nginx/
     env_file: .env
@@ -37,3 +40,4 @@ services:
     volumes:
       - static:/static
       - media:/media
+    container_name: gateway
